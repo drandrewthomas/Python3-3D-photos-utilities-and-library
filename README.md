@@ -17,4 +17,4 @@ Example Python 3 code files are:
 
 ## Credits
 
-Finally, please note this repository is copyright 2023 Andrew Thomas who also runs [parth3d.co.uk](https://parth3d.co.uk). Please enjoy them both :-)
+This repository is copyright 2023 Andrew Thomas who also runs [parth3d.co.uk](https://parth3d.co.uk). Please enjoy them both :-)
