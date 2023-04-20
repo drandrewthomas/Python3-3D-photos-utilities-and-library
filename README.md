@@ -4,6 +4,8 @@ This repository contains a simple library, with examples, for loading and manipu
 
 ![Example output for rotating and cropping](pythonrotatecrop.jpg)
 
+## Example code
+
 Example Python 3 code files are:
 
 * anabatch.py - Converts all side-by-side images in the 'convertglyph' folder to anaglyphs.
@@ -12,5 +14,7 @@ Example Python 3 code files are:
 * loadsbs.py - Example of loading MPO and side-by-side JPG files.
 * rotatewithcrop.py - Example of loading and rotating side-by-side images with automatic cropping.
 * sbs2glyph.py - Example of loading a side-by-side image and converting it to an anaglyph.
+
+## Credits
 
 Finally, please note this repository is copyright 2023 Andrew Thomas who also runs [parth3d.co.uk](https://parth3d.co.uk). Please enjoy them both :-)
