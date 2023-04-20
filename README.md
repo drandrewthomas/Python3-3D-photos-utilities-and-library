@@ -2,7 +2,7 @@
 
 This repository contains a simple library, with examples, for loading and manipulating 3D photos and images in Python 3. The main code modules for the library can be found in the 'photos3d' folder.
 
-![Example output for rotating and cropping](pythonrotatecrop.jpg)
+![Example output for rotating and cropping](markdownstuff/pythonrotatecrop.jpg)
 
 ## Example code
 
