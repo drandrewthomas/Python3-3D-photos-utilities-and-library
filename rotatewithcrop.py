@@ -5,9 +5,9 @@ rectangle based on the rotation angle. The example uses a JPG 3D photo but it wo
 as well with an MPO file.
 """
 
-import math, os
+import os
+from PIL import ImageDraw
 from matplotlib import pyplot as plt
-from PIL import Image, ImageDraw
 from photos3d import image as img
 from photos3d import sbs as sbsimg
 
