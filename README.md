@@ -6,6 +6,8 @@ This repository contains a simple library, with examples, for loading and manipu
 
 ## Screenshots
 
+Below are some screenshots to illustrate use of Photos3D in Python 3. Clockwise from top left they show loading and viewing side-by-side images, rotating stereo image pairs, creating an anaglyph from stereo image pairs and splitting a monochrome anaglyph into two stereo views.
+
 <p align="center"><img src="markdownstuff/photos3dcollage.jpg" width="512" height="512" alt="Example output for rotating and cropping" /></p>
 
 ## Example Python 3 code
