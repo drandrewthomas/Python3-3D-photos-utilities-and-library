@@ -16,6 +16,7 @@ Example Python 3 code files are:
 
 * anabatch.py - Converts all side-by-side images in the 'convertglyph' folder to anaglyphs.
 * mpobatch.py - Converts all MPO files in the 'convertmpo' folder to side-by-side JPG files.
+* makeglyph.py - Example of making an anaglyph image from left and right image files.
 * makesbs.py - Example of making a side-by-side image from left and right image files.
 * glyph2sbs.py - Example of how to split left and right views from a monochrome anaglyph.
 * loadsbs.py - Example of loading MPO and side-by-side JPG files.
