@@ -26,8 +26,7 @@ Example Python 3 code files are:
 
 The following sources of information and code are gratefully acknowledged:
 
-The code in image.py for automagically cropping rotated images is [based on examples on Stack Overflow](https://stackoverflow.com/questions/16702966/rotate-image-and-crop-out-black-borders).
-
-The formula in image.py to convert colours to luminance-based monochrome [is taken from Wikipedia](https://en.wikipedia.org/wiki/Grayscale).
+* The code in image.py for automagically cropping rotated images is [based on examples on Stack Overflow](https://stackoverflow.com/questions/16702966/rotate-image-and-crop-out-black-borders).
+* The formula in image.py to convert colours to luminance-based monochrome [is taken from Wikipedia](https://en.wikipedia.org/wiki/Grayscale).
 
 This repository is copyright 2023 Andrew Thomas who also runs [parth3d.co.uk](https://parth3d.co.uk). Please enjoy them both :-)
