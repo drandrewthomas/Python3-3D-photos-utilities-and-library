@@ -1,3 +1,7 @@
+"""
+image.py - Library module for general image processing operations, mostly allowing for the same operation on two images in one call.
+"""
+
 import math
 from PIL import Image, ImageEnhance, ImageFilter
 
@@ -7,12 +11,22 @@ def open(fname, rgb=True):
         im = toRGB(im)
     return im
 
+def open_overlay(fname, rgba=False):
+    im = Image.open(fname)
+    if rgba:
+        im = toRGBA(im)
+    return im
+
 def size(img):
     imw, imh = img.size
     return [imw, imh]
 
 def toRGB(img):
     nimg = img.convert('RGB')
+    return nimg
+
+def toRGBA(img):
+    nimg = img.convert('RGBA')
     return nimg
 
 def rotate(degrees, img, img2=None, docrop=True, doexpand=True, fill=(0, 0, 0)):
@@ -45,6 +59,71 @@ def crop_roi(roi, img, img2=None):
         cimg2 = crop(roi[0], roi[1], roi[0]+roi[2], roi[1]+roi[3], img)
         return [cimg, cimg2]
     return cimg
+
+def resize(nw, nh, img, img2=None):
+    nim = img.resize((nw, nh), Image.ANTIALIAS)
+    if img2 != None:
+        nim2 = resize(nw, nh, img2)
+        return [nim, nim2]
+    return nim
+
+def resize_width(nw, img, img2=None):
+    ow, oh = img.size
+    scl = nw / ow
+    nh = int(oh * scl)
+    nim = img.resize((nw, nh), Image.ANTIALIAS)
+    if img2 != None:
+        nim2 = resize_width(nw, img2)
+        return [nim, nim2]
+    return nim
+
+def resize_height(nh, img, img2=None):
+    ow, oh = img.size
+    scl = nh / oh
+    nw = int(ow * scl)
+    nim = img.resize((nw, nh), Image.ANTIALIAS)
+    if img2 != None:
+        nim2 = resize_height(nh, img2)
+        return [nim, nim2]
+    return nim
+
+def change_aspect_ratio(woverh, img, img2=None, back=(255, 255, 255)):
+    w, h = img.size
+    nw = h * woverh
+    nh = w / woverh
+    if nw > w:
+        nh = nw / woverh
+    else:
+        nw = nh * woverh
+    xoff = (nw - w) / 2
+    yoff = (nh - h) / 2
+    cimg = Image.new("RGB", (int(nw), int(nh)), back)
+    cimg.paste(img, (int(xoff), int(yoff)))
+    if img2 != None:
+        cimg2 = change_aspect_ratio(woverh, img2, None, back)
+        return [cimg, cimg2]
+    return cimg
+
+def overlay(x, y, ovl, img, ovl2=None, img2=None, mirrorx=False, alpha=True):
+    # Overlay is pasted centred on image adjusted by x and y
+    iw, ih = size(img)
+    ow, oh = size(ovl)
+    offx = (iw / 2) - (ow / 2) + x
+    offy = (ih / 2) - (oh / 2) + y
+    nim = Image.new("RGBA", (iw, ih), (0, 0, 0))
+    nim.paste(img, (0, 0))
+    if ovl.mode == "RGBA" and alpha:
+        _, _, _, mask = ovl.split()
+        nim.paste(ovl, (int(offx), int(offy)), mask)
+    else:
+        nim.paste(ovl, (int(offx), int(offy)))
+    if img2 != None and ovl2 != None:
+        if mirrorx:
+            nim2 = overlay(-x, y, ovl2, img2)
+        else:
+            nim2 = overlay(x, y, ovl2, img2)
+        return [nim, nim2]
+    return nim
 
 def brightness(bright, img, img2=None):
     enh = ImageEnhance.Brightness(img)

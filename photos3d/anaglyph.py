@@ -1,3 +1,7 @@
+"""
+anaglyph.py - Library module for loading and creating red-cyan anaglyph images.
+"""
+
 from PIL import Image
 
 def create(lim, rim):
@@ -48,36 +52,7 @@ def split(ang, gbmode="av"):
             rpix[x, y] = (rc, rc, rc)
     return [lim, rim]
 
-def split_from_disparity(ang, disp, invdisp):
-    lv = side_from_disparity(ang, invdisp, side="left")
-    rv = side_from_disparity(ang, disp, side="right")
-    return [lv, rv]
-
-def side_from_disparity(ang, disp, side="left"):
-    aglw, aglh = ang.size
-    imv = Image.new("RGB", (aglw, aglh), (255,255,255))
-    apix = ang.load()
-    vpix = imv.load()
-    for y in range(0, aglh):
-        for x in range(0, aglw):
-            if disp[y][x] == -9999:
-                offpix = x
-            else:
-                if side == "left":
-                    offpix = x - disp[y][x]
-                else:
-                    offpix = x + disp[y][x]
-            if offpix < 0 or offpix >= aglw:
-                offpix = x
-            r1, g1, b1 = apix[x, y]
-            r2, g2, b2 = apix[offpix, y]
-            if side == "left":
-                col = (r1, g2, b2)
-            else:
-                col = (r2, g1, b1)
-            vpix[x, y] = col
-    return imv
 
 if __name__ == '__main__':
-    print("Tests in main")
-    #im = load("./testimages/druidsglyph.png")
+    print("Anaglyph module.")
+

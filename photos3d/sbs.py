@@ -1,3 +1,7 @@
+"""
+sbs.py - Library for loading and creating side-by-side stereo image pairs.
+"""
+
 from PIL import Image
 import os
 import io

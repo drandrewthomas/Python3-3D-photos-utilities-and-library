@@ -3,5 +3,7 @@
 The files here are the main Photos3D library code modules. The modules are:
 
 * anaglyph.py - Functions for loading and manipulating anaglyph images.
-* sbs.py - Functions for loading and manipulating side-by-side images.
 * image.py - Functions for operations on images or pairs of them.
+* jpegtool.py - Functions for analysing jpeg-based files and carrying out low-level operations on them.
+* sbs.py - Functions for loading and manipulating side-by-side images.
+
