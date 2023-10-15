@@ -1,7 +1,5 @@
 """
-loadsbs.py - An example of using the sbs module to load stereo pairs from image
-files in both JPG and MPO formats. Both formats are loaded using exatly the same
-syntax as the sbs module works out what to do.
+loadsbs.py - An example of using the sbs module to load stereo pairs from image files in both JPG and MPO formats. Both formats are loaded using exactly the same syntax as the sbs module works out what to do.
 """
 
 import os
