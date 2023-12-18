@@ -1,5 +1,17 @@
 # Changelog
 
+## 18 December 2023
+
+* Added depthmaps.py library module for creating 3D stereo images using one RGB image and a corresponding monochrome depth image.
+
+* Added depth2sbs.py as an example of using the depthmaps library module. It uses a new test image (beeflower.jpg) made using the Looking Glass AI 2D photo to 3D image convertor.
+
+* Corrected some bugs in batchprocess.py that prevented operations on files with .jpeg extensions.
+
+* The sbs.py library module now supports up-down and left-right 3D image formats.
+
+* The batchprocess.py example now supports converting Google Cardboard panorama images (with 'vr.jpg' or 'vr.jpeg' file extensions only) to up-down jpeg files.
+
 ## 15 October 2023
 
 * Removed anabatch.py and mpobatch.py, together with the folders they used. Their functions can now be better obtained from the batch processing described below.
