@@ -61,7 +61,7 @@ def crop_roi(roi, img, img2=None):
     return cimg
 
 def resize(nw, nh, img, img2=None):
-    nim = img.resize((nw, nh), Image.ANTIALIAS)
+    nim = img.resize((nw, nh), Image.LANCZOS)
     if img2 != None:
         nim2 = resize(nw, nh, img2)
         return [nim, nim2]
@@ -71,7 +71,7 @@ def resize_width(nw, img, img2=None):
     ow, oh = img.size
     scl = nw / ow
     nh = int(oh * scl)
-    nim = img.resize((nw, nh), Image.ANTIALIAS)
+    nim = img.resize((nw, nh), Image.LANCZOS)
     if img2 != None:
         nim2 = resize_width(nw, img2)
         return [nim, nim2]
@@ -81,7 +81,7 @@ def resize_height(nh, img, img2=None):
     ow, oh = img.size
     scl = nh / oh
     nw = int(ow * scl)
-    nim = img.resize((nw, nh), Image.ANTIALIAS)
+    nim = img.resize((nw, nh), Image.LANCZOS)
     if img2 != None:
         nim2 = resize_height(nh, img2)
         return [nim, nim2]

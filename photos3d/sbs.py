@@ -6,15 +6,21 @@ from PIL import Image
 import os
 import io
 
-def create(lim, rim):
+def create(lim, rim, mode='lr'):
     # Both images must be same size!
     w, h = lim.size
-    sbsim = Image.new("RGB", (w*2, h), (0,0,0))
-    sbsim.paste(lim, (0,0))
-    sbsim.paste(rim, (w,0))
+    if mode == 'ud':
+        sbsim = Image.new("RGB", (w, h*2), (0, 0, 0))
+        sbsim.paste(lim, (0, 0))
+        sbsim.paste(rim, (0, h))
+        return sbsim
+    #Default to left-right ('lr')
+    sbsim = Image.new("RGB", (w*2, h), (0, 0, 0))
+    sbsim.paste(lim, (0, 0))
+    sbsim.paste(rim, (w, 0))
     return sbsim
 
-def load(fn, maxwid=None, rgb=True, dosplit=False):
+def load(fn, maxwid=None, rgb=True, dosplit=False, mode='lr'):
     fname, fext = os.path.splitext(fn)
     if fext == ".mpo" or fext == ".MPO":
         pim = Image.open(fn)
@@ -30,17 +36,23 @@ def load(fn, maxwid=None, rgb=True, dosplit=False):
         if w > maxwid:
             asp = w / h
             nh = int(maxwid / asp)
-            im = im.resize((maxwid, nh), Image.ANTIALIAS)
+            im = im.resize((maxwid, nh), Image.LANCZOS)
     if rgb:
         if im.mode == "RGBA":
             im = im.convert('RGB')
     if dosplit:
-        left, right = split(im)
+        left, right = split(im, mode)
         im = [left, right]
     return im
 
-def split(sbs):
+def split(sbs, mode='lr'):
     sbsw, sbsh = sbs.size
+    if mode == 'ud':
+        nh = int(sbsh/2)
+        top = sbs.crop((0, 0, sbsw, nh))
+        bottom = sbs.crop((0, sbsh-nh, sbsw, sbsh))
+        return [top, bottom]
+    #Default to left-right ('lr')
     nw = int(sbsw/2)
     # Crop order: left, top, right, bottom
     left = sbs.crop((0, 0, nw, sbsh))

@@ -25,7 +25,7 @@ def load(fn, maxwid=None, rgb=True):
         if w > maxwid:
             asp = w / h
             nh = int(maxwid / asp)
-            pim = pim.resize((maxwid, nh), Image.ANTIALIAS)
+            pim = pim.resize((maxwid, nh), Image.LANCZOS)
     if rgb:
         if pim.mode == "RGBA":
             pim = pim.convert('RGB')

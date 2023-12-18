@@ -123,7 +123,7 @@ def __open_image_file__(fname, maxwid=None):
         if w > mwid:
             asp = w / h
             nh = int(mwid / asp)
-            img = img.resize((mwid, nh), Image.ANTIALIAS)
+            img = img.resize((mwid, nh), Image.LANCZOS)
     if img.mode == "RGBA":
         img = img.convert('RGB')
     return img
