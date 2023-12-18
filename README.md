@@ -26,6 +26,7 @@ Example Python 3 code files are:
 * loadsbs.py - Example of loading MPO and side-by-side JPG files.
 * rotatewithcrop.py - Example of loading and rotating side-by-side images with automatic cropping.
 * sbs2glyph.py - Example of loading a side-by-side image and converting it to an anaglyph.
+* depth2sbs.py - Shows how to create side-by-side stereo images using RGB and depth map images.
 
 ## Credits
 
@@ -35,4 +36,4 @@ The following sources of information and code are gratefully acknowledged:
 * The formula in image.py to convert colours to luminance-based monochrome [is taken from Wikipedia](https://en.wikipedia.org/wiki/Grayscale).
 * The open source [jpegdump.c](https://svn.xiph.org/experimental/giles/jpegdump.c) program was invaluable in providing a wide range of JPEG markers to add to the standard ones in the jpegtool library.
 
-This repository is copyright 2022-2023 Andrew Thomas who also runs [parth3d.co.uk](https://parth3d.co.uk). Please enjoy them both :-)
+This repository is copyright 2022-2024 Andrew Thomas who also runs [parth3d.co.uk](https://parth3d.co.uk). Please enjoy them both :-)
