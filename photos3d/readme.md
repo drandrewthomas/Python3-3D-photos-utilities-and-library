@@ -6,4 +6,5 @@ The files here are the main Photos3D library code modules. The modules are:
 * image.py - Functions for operations on images or pairs of them.
 * jpegtool.py - Functions for analysing jpeg-based files and carrying out low-level operations on them.
 * sbs.py - Functions for loading and manipulating side-by-side images.
+* depthmaps.py - Functions for dealing with depth maps and converting them to stereo images.
 
