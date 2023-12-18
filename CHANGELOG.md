@@ -12,6 +12,8 @@
 
 * The batchprocess.py example now supports converting Google Cardboard panorama images (with 'vr.jpg' or 'vr.jpeg' file extensions only) to up-down jpeg files.
 
+* Changed deprecated Pillow ANTIALIAS in resize methods to LANCZOS.
+
 ## 15 October 2023
 
 * Removed anabatch.py and mpobatch.py, together with the folders they used. Their functions can now be better obtained from the batch processing described below.
