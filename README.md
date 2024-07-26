@@ -27,6 +27,7 @@ Example Python 3 code files are:
 * rotatewithcrop.py - Example of loading and rotating side-by-side images with automatic cropping.
 * sbs2glyph.py - Example of loading a side-by-side image and converting it to an anaglyph.
 * depth2sbs.py - Shows how to create side-by-side stereo images using RGB and depth map images.
+* pixelsmdepth.py - Example of making a side-by-side image from a Pixel Camera photo with embedded depth map.
 
 ## Credits
 
