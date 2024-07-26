@@ -1,3 +1,7 @@
+"""
+depthmaps.py - Library module for working with depth maps, such as for using them to convert RGB-D images to stereo pairs.
+"""
+
 import os
 import numpy as np
 from PIL import Image
@@ -8,16 +12,22 @@ def load(fn1, fn2=None, maxwid=None):
         img1 = __open_image_file__(fn1, maxwid=maxwid)
         img2 = __open_image_file__(fn2, maxwid=maxwid)
     else:
-        img1 = __open_image_file__(fn1, maxwid=(2*maxwid))
+        if maxwid == None:
+            img1 = __open_image_file__(fn1, None)
+        else:
+            img1 = __open_image_file__(fn1, 2 * maxwid)
         img1, img2 = __split_image__(img1)
     return [img1, img2]
 
-def quick_rgbd_to_stereo(fn1, fn2=None, strength='medium', converge='far', maxwid=None):
+def quick_rgbd_to_stereo(fn1, fn2=None, strength='medium', converge='far', maxwid=None, bufferz=True):
     rgbim, depim = load(fn1, fn2, maxwid=maxwid)
     darr = depth_image_to_array(depim)
     dispmin, dispmax = estimate_disparity(rgbim, strength=strength, converge=converge)
     disps = depth_array_to_disparity(darr, mindisp=dispmin, maxdisp=dispmax)
-    sbs = depth_to_stereo(rgbim, disps)
+    if bufferz:
+        sbs = depth_to_stereo(rgbim, disps, darr)
+    else:
+        sbs = depth_to_stereo(rgbim, disps)
     return sbs
 
 def estimate_disparity(img, strength='medium', converge='far'):
@@ -65,12 +75,12 @@ def depth_image_to_array(dimg, ch='red'):
     return depth
 
 def depth_array_to_disparity(depth, mindisp=-10, maxdisp=10, params=None):
+    dh, dw = depth.shape
     if params == None:
         amn, amx, avg = __array_info__(depth)
     else:
         amn = params[0]
         amx = params[1]
-    dh, dw = depth.shape
     disp = np.zeros((dh, dw), dtype="float32") # (rows, cols)
     for y in range(0, dh):
         for x in range(0, dw):
@@ -82,26 +92,44 @@ def depth_array_to_disparity(depth, mindisp=-10, maxdisp=10, params=None):
             disp[y, x] = __map__(dep, amn, amx, mindisp, maxdisp)
     return disp
 
-def depth_to_stereo(rgbimg, disps):
+def depth_to_stereo(rgbimg, disps, depths=None, prefill=True):
+    dobuff = False
+    if isinstance(depths, np.ndarray):
+        dobuff = True
     imw, imh = rgbimg.size
     newimg = Image.new("RGB", (imw * 2, imh), (255, 255, 255))
+    if prefill:
+        newimg.paste(rgbimg, (0, 0))
+        newimg.paste(rgbimg, (imw, 0))
     opix = rgbimg.load()
     npix = newimg.load()
+    if dobuff:
+        dbuff = __blank_buffer__(imh, imw * 2) # rows, cols
     for y in range(0, imh):
         for x in range(0, imw):
             disp = disps[y, x]
-            dx = x - (disp / 2)
-            if dx < 0:
-                dx = 0
-            if dx >= imw:
-                dx = imw - 1
-            npix[x, y] = opix[dx, y]
-            dx = x + (disp / 2)
-            if dx < 0:
-                dx = 0
-            if dx >= imw:
-                dx = imw - 1
-            npix[x + imw, y] = opix[dx, y]
+            ldx = x - (disp / 2)
+            ldx = int(ldx + 0.5)
+            if ldx < 0:
+                ldx = 0
+            if ldx >= imw:
+                ldx = imw - 1
+            rdx = x + (disp / 2)
+            rdx = int(rdx + 0.5)
+            if rdx < 0:
+                rdx = 0
+            if rdx >= imw:
+                rdx = imw - 1
+            if dobuff:
+                if depths[y, x] < dbuff[y, ldx]:
+                    dbuff[y, ldx] = depths[y, x]
+                    npix[x, y] = opix[ldx, y]
+                if depths[y, x] < dbuff[y, rdx + imw]:
+                    dbuff[y, rdx + imw] = depths[y, x]
+                    npix[x + imw, y] = opix[rdx, y]
+            else:
+                npix[x, y] = opix[ldx, y]
+                npix[x + imw, y] = opix[rdx, y]
     return newimg
 
 
@@ -134,6 +162,13 @@ def __split_image__(img):
     left = img.crop((0, 0, nw, sbsh))
     right = img.crop((sbsw-nw, 0, sbsw, sbsh))
     return [left, right]
+
+def __blank_buffer__(rows, cols, dep=99999999):
+    buff = np.zeros((rows, cols), dtype="float32") # (rows, cols)
+    for y in range(0, rows):
+        for x in range(0, cols):
+            buff[y, x] = dep
+    return buff
 
 def __array_info__(arr):
     avg = 0

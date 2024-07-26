@@ -256,7 +256,7 @@ def get_xmp_apps(fname, markers=None, apps=None):
                 xmps.append(app)
     return xmps
 
-def get_extended_xmp_apps(fname, markers=None, apps=None, dosort=True):
+def get_extended_xmp_apps(fname, markers=None, apps=None, dosort=True, dochecks=True, debug=False):
     tag = b"http://ns.adobe.com/xmp/extension/"
     if markers == None:
         flen, markers = find_markers(fname)
@@ -276,12 +276,38 @@ def get_extended_xmp_apps(fname, markers=None, apps=None, dosort=True):
                 exmps.append([app, md5, xlen, xpos, dlen-75, dst+75])
     if len(exmps) == 0:
         return []
+    if not dochecks:
+        if dosort:
+            exmps = sorted(exmps, key=lambda x: x[3])
+        return exmps
     etot = 0
     for exi in exmps:
         etot = etot + exi[4]
     if etot != exmps[0][2]:
-        print("Wrong length extended XMP data found!")
-        return []
+        print("Wrong length extended XMP data: found " + str(etot) + " but expected " + str(exmps[0][2]) + "!")
+        if debug:
+            print()
+            print("********** START OF XMP LIST **********")
+            print(exmps)
+            print("********** END OF XMP LIST **********")
+            print()
+            multi = False
+            for c in range(len(exmps)-1, 1, -1):
+                if (exmps[c][0] - exmps[c-1][0]) > 1:
+                    multi = c
+                    exmps.pop(c)
+            for c in range(len(exmps)-1, 1, -1):
+                if exmps[c][1] != exmps[0][1]:
+                    multi = c
+                    exmps.pop(c)
+            if multi:
+                print("Multiple extended XMP sections found (returning first)!")
+                exmps = exmps[0 : multi]
+                etot = 0
+                for exi in exmps:
+                    etot = etot + exi[4]
+            else:
+                return []
     for ind, exm in enumerate(exmps):
         if ind == 0:
             md5 = exm[1]

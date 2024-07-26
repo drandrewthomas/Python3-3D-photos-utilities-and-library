@@ -177,6 +177,20 @@ def monochrome(mode, img, img2=None):
         return [newimg, newimg2]
     return newimg
 
+def negative(img, img2=None):
+    imw, imh = img.size
+    newimg = Image.new("RGB", (imw, imh), (255,255,255))
+    opix = img.load()
+    npix = newimg.load()
+    for y in range(0, imh):
+        for x in range(0, imw):
+            col = opix[x, y]
+            npix[x, y] = (255 - col[0], 255 - col[1],255 - col[2])
+    if img2 != None:
+        newimg2 = monochrome(img2)
+        return [newimg, newimg2]
+    return newimg
+
 def findedges(img, img2=None):
     tim = img.convert("L")
     tim = tim.filter(ImageFilter.FIND_EDGES)
