@@ -1,5 +1,17 @@
 # Changelog
 
+## 26 July 2024
+
+* Minor improvements to jpegtool.py module.
+
+* When multiple extended XMP sections are found by get_extended_xmp_apps in jpegtool.py the first one is returned.
+
+* The depthmaps.py module now includes use of depth buffering and prefilling with the original image in case some pixels don't get drawn to.
+
+* The image.py module now has a negative image operation.
+
+* The pixelsmdepth.py example is added to show how to convert a Pixel phone social media depth enabled portrait-mode photo (i.e. one with a depth map embedded within it) to a side-by-side stereo image.
+
 ## 18 December 2023
 
 * Added depthmaps.py library module for creating 3D stereo images using one RGB image and a corresponding monochrome depth image.

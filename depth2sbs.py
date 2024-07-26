@@ -2,6 +2,7 @@
 depth2sbs.py - An example of creating a side-by-side stereo 3D image using an RGBD file with the colour image on the left and the monochrome depth image on the right (you can do it other ways quite easily, including using separate rgb and depth files - see depthmaps.py - but this example uses a Looking Glass 2D photo conversion in that format).
 """
 
+
 import os
 
 from photos3d import depthmaps as dm
@@ -28,7 +29,7 @@ dispmin, dispmax = dm.estimate_disparity(rgbim, strength='medium', converge='far
 disps = dm.depth_array_to_disparity(darr, mindisp=dispmin, maxdisp=dispmax)
 
 # And then we make the side-by-side stereo image
-sbs = dm.depth_to_stereo(rgbim, disps)
+sbs = dm.depth_to_stereo(rgbim, disps, darr)
 
 # The stereo picture is a Pillow image so we can save it
 #sbs.save("sbs.png")
