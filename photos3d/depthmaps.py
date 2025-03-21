@@ -57,7 +57,7 @@ def estimate_disparity(img, strength='medium', converge='far'):
             maxdisp = disp * (1 - converge)
     return [mindisp, maxdisp]
 
-def depth_image_to_array(dimg, ch='red'):
+def depth_image_to_array(dimg, ch='red', invert=False):
     dw, dh = dimg.size
     depth = np.zeros((dh, dw), dtype="float32") # (rows, cols)
     dpix = dimg.load()
@@ -72,6 +72,8 @@ def depth_image_to_array(dimg, ch='red'):
                 depth[y, x] = col[2]
             else:
                 depth[y, x] = (col[0] + col[1] + col[2]) / 3
+            if invert:
+                depth[y, x] = 255 - depth[y, x]
     return depth
 
 def depth_array_to_disparity(depth, mindisp=-10, maxdisp=10, params=None):
