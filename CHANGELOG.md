@@ -1,5 +1,21 @@
 # Changelog
 
+## 21 March 2025
+
+* The image 'beeflower.jpg' in the testimages folder has been replaced with a better version produced by the Android DepthMaker app.
+
+* The function depth_image_to_array in depthmaps.py now has an option to invert depth values for depthmaps with white in the distance and black close up.
+
+* The example depth2sbs.py has been updated to use the new 'beeflower.jpg' image with depth values inverted.
+
+* Changed pixelsmdepth.py to give the option of either running the example or splitting JPG files in the imagestoprocess folder into rgb/depthmap pairs.
+
+* Changed batchprocess.py to allow operations such as aspect ratio changing for PNG image files.
+
+* Added mirrored bottom option to batchprocess.py which takes side-by-side images, makes a copy with left and right views swapped, and adds the swapped image below the original (i.e. a 4x4 image grid).
+
+* Made a small change to batchprocess.py to stop a weird bug where a space was appended to file extensions in get_file_list (possibly this is a Pythonista thing, but the change should work everywhere else too).
+
 ## 26 July 2024
 
 * Minor improvements to jpegtool.py module.

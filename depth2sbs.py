@@ -20,7 +20,8 @@ sbs = dm.quick_rgbd_to_stereo(fname, strength='medium', converge='far', maxwid=1
 rgbim, depim = dm.load(fname, maxwid = 1000)
 
 # Now we read the depth image pixel colour values into a numpy array
-darr = dm.depth_image_to_array(depim)
+# For images with white farthest away we need to invert the depths.
+darr = dm.depth_image_to_array(depim, invert=True)
 
 # We can also get possible values for the scale of disparity needed
 dispmin, dispmax = dm.estimate_disparity(rgbim, strength='medium', converge='far')
