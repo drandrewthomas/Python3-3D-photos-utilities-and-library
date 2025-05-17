@@ -72,15 +72,7 @@ def create_linear_disparity_vector(neardisp, fardisp):
         dispvec.append(neardisp - ((c / 255) * (neardisp - fardisp)))
     return dispvec
 
-def create_tangent_disparity_vector(neardisp, fardisp):
-    # *** NEEDS COMPLETING!!! ***
-    dispvec = []
-    for c in range(0, 256):
-        dispvec.append(0)
-    return dispvec
-
 def create_tangent_disparity_vector(neardisp, cvg = 0.15, fac=1):
-    # CONVERGE AT CVG ???!!!
     # neardisp is in pixels.
     # conv is 0.05 to 1 * total depth.
     # dfac is 0.1 to 10 * total depth:
@@ -108,9 +100,6 @@ def create_tangent_disparity_vector(neardisp, cvg = 0.15, fac=1):
 def depth_to_stereo(rgbimg, depths, dispvect, prefill=True, blurfill=True, do3ddepth=True, dscl=None):
     """
     Note that for simplicity do3ddepth means the depth is calculated using pythagoras from the centre of the image (i.e. not from the two individual eye views).
-    """
-    """
-    ADD AVERAGE DEPTH WITH ONES ADJACENT TO TRY TO REMOVE ARTIFACTS??????
     """
     imw, imh = rgbimg.size
     newimg = Image.new("RGB", (imw * 2, imh), (255, 255, 255))
