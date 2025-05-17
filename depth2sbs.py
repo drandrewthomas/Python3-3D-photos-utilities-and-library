@@ -1,5 +1,5 @@
 """
-depth2sbs.py - An example of creating a side-by-side stereo 3D image using an RGBD file with the colour image on the left and the monochrome depth image on the right (you can do it other ways quite easily, including using separate rgb and depth files - see depthmaps.py - but this example uses a Looking Glass 2D photo conversion in that format).
+depth2sbs.py - An example of creating a side-by-side stereo 3D image using an RGBD file with the colour image on the left and the monochrome depth image on the right (you can do it other ways quite easily, including using separate rgb and depth files - see depthmaps.py - but this example uses a 2D photo conversion in that format created using the excellent DepthMaker Android app).
 """
 
 
@@ -10,27 +10,22 @@ from photos3d import depthmaps as dm
 
 fname = os.path.join(".", "testimages", "beeflower.jpg")
 
-"""
-You can just use the code below to get the side by side stereo image, but the code below that gives a fuller method that can be adapted to handle other, and more complicated, needs.
-
-sbs = dm.quick_rgbd_to_stereo(fname, strength='medium', converge='far', maxwid=1000)
-"""
-
 # First load the RGBD image (omit maxwid to keep original image sizes)
 rgbim, depim = dm.load(fname, maxwid = 1000)
 
 # Now we read the depth image pixel colour values into a numpy array
-# For images with white farthest away we need to invert the depths.
+# and for images with white farthest away we need to invert the depths.
 darr = dm.depth_image_to_array(depim, invert=True)
 
 # We can also get possible values for the scale of disparity needed
-dispmin, dispmax = dm.estimate_disparity(rgbim, strength='medium', converge='far')
+dispnear, dispfar = dm.estimate_disparity(rgbim, strength='medium', converge='far')
 
-# Next we calculate disparity values for the depth data
-disps = dm.depth_array_to_disparity(darr, mindisp=dispmin, maxdisp=dispmax)
+# We create a vector for the depth (0...255) to disparity relationship
+#dvec = dm.create_linear_disparity_vector(dispnear, dispfar)
+dvec = dm.create_tangent_disparity_vector(dispnear*0.6, cvg = 0.5, fac=0.75) #cvg = 0.15, fac=1)
 
 # And then we make the side-by-side stereo image
-sbs = dm.depth_to_stereo(rgbim, disps, darr)
+sbs = dm.depth_to_stereo(rgbim, darr, dvec, do3ddepth=False)
 
 # The stereo picture is a Pillow image so we can save it
 #sbs.save("sbs.png")

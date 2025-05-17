@@ -1,5 +1,17 @@
 # Changelog
 
+## 17 May 2025
+
+* The quick_rgbd_to_stereo function has been removed from the depthmaps.py library module as the full method shown in the depth2sbs.py example is quite simple to use.
+
+* A new tangent-based depth to disparity method has been added to depthmaps.py and is now the default although the old linear method is still available if you prefer.
+
+* The depthmaps.py library module has been updated to use a new depth to image method that calculates disparity from a depth (0...255) to disparity (pixels) relationship in a vector list. Other parts of the code have been updated to correspond to that change too.
+
+* The depth_to_stereo method in depthmaps.py now has a do3ddepth parameter. It basically gives a quasi-spherical projection that is off by default, but can be fun to play with.
+
+* The depth2sbs.py example has been updated to use the revised depthmaps.py library module.
+
 ## 21 March 2025
 
 * The image 'beeflower.jpg' in the testimages folder has been replaced with a better version produced by the Android DepthMaker app.
