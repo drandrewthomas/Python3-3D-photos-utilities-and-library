@@ -1,10 +1,11 @@
 """
 depthmaps.py - Library module for working with depth maps, such as for using them to convert RGB-D images to stereo pairs.
+
 """
 
-import os
+import math
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageFilter
 
 
 def load(fn1, fn2=None, maxwid=None):
@@ -18,17 +19,6 @@ def load(fn1, fn2=None, maxwid=None):
             img1 = __open_image_file__(fn1, 2 * maxwid)
         img1, img2 = __split_image__(img1)
     return [img1, img2]
-
-def quick_rgbd_to_stereo(fn1, fn2=None, strength='medium', converge='far', maxwid=None, bufferz=True):
-    rgbim, depim = load(fn1, fn2, maxwid=maxwid)
-    darr = depth_image_to_array(depim)
-    dispmin, dispmax = estimate_disparity(rgbim, strength=strength, converge=converge)
-    disps = depth_array_to_disparity(darr, mindisp=dispmin, maxdisp=dispmax)
-    if bufferz:
-        sbs = depth_to_stereo(rgbim, disps, darr)
-    else:
-        sbs = depth_to_stereo(rgbim, disps)
-    return sbs
 
 def estimate_disparity(img, strength='medium', converge='far'):
     mindisp = maxdisp = 0
@@ -55,7 +45,7 @@ def estimate_disparity(img, strength='medium', converge='far'):
         if converge <= 1:
             mindisp = - (disp * converge)
             maxdisp = disp * (1 - converge)
-    return [mindisp, maxdisp]
+    return [maxdisp, mindisp]
 
 def depth_image_to_array(dimg, ch='red', invert=False):
     dw, dh = dimg.size
@@ -76,69 +66,114 @@ def depth_image_to_array(dimg, ch='red', invert=False):
                 depth[y, x] = 255 - depth[y, x]
     return depth
 
-def depth_array_to_disparity(depth, mindisp=-10, maxdisp=10, params=None):
-    dh, dw = depth.shape
-    if params == None:
-        amn, amx, avg = __array_info__(depth)
-    else:
-        amn = params[0]
-        amx = params[1]
-    disp = np.zeros((dh, dw), dtype="float32") # (rows, cols)
-    for y in range(0, dh):
-        for x in range(0, dw):
-            dep = depth[y, x]
-            if dep < amn:
-                dep = amn
-            if dep > amx:
-                dep = amx
-            disp[y, x] = __map__(dep, amn, amx, mindisp, maxdisp)
-    return disp
+def create_linear_disparity_vector(neardisp, fardisp):
+    dispvec = []
+    for c in range(0, 256):
+        dispvec.append(neardisp - ((c / 255) * (neardisp - fardisp)))
+    return dispvec
 
-def depth_to_stereo(rgbimg, disps, depths=None, prefill=True):
-    dobuff = False
-    if isinstance(depths, np.ndarray):
-        dobuff = True
+def create_tangent_disparity_vector(neardisp, fardisp):
+    # *** NEEDS COMPLETING!!! ***
+    dispvec = []
+    for c in range(0, 256):
+        dispvec.append(0)
+    return dispvec
+
+def create_tangent_disparity_vector(neardisp, cvg = 0.15, fac=1):
+    # CONVERGE AT CVG ???!!!
+    # neardisp is in pixels.
+    # conv is 0.05 to 1 * total depth.
+    # dfac is 0.1 to 10 * total depth:
+    #     < 1 moves disparities toward far
+    #     > 1 squashes them nearer zero
+    disps = []
+    conv = __constrain__(cvg, 0.05, 1)
+    dfac = __constrain__(fac, 0.1, 10)
+    cd = conv * 255 * dfac
+    eyerot = math.atan((neardisp / 2) / cd)
+    for c in range(0, 256):
+        # Add half increment so we do not start at tan(zero)
+        dist = (c * dfac) + (dfac / 2)
+        #
+        #dist = dist * 0.25
+        #
+        tang = math.atan((neardisp / 2) / dist)
+        dang = 2 * ((tang + 1000) - (eyerot + 1000))
+        disps.append(dang)
+    df = neardisp / disps[0]
+    for c in range(0, len(disps)):
+        disps[c] = disps[c] * df
+    return disps
+
+def depth_to_stereo(rgbimg, depths, dispvect, prefill=True, blurfill=True, do3ddepth=True, dscl=None):
+    """
+    Note that for simplicity do3ddepth means the depth is calculated using pythagoras from the centre of the image (i.e. not from the two individual eye views).
+    """
+    """
+    ADD AVERAGE DEPTH WITH ONES ADJACENT TO TRY TO REMOVE ARTIFACTS??????
+    """
     imw, imh = rgbimg.size
     newimg = Image.new("RGB", (imw * 2, imh), (255, 255, 255))
     if prefill:
-        newimg.paste(rgbimg, (0, 0))
-        newimg.paste(rgbimg, (imw, 0))
+        if blurfill:
+            newimg.paste(rgbimg.filter(ImageFilter.BLUR), (0, 0))
+            newimg.paste(rgbimg.filter(ImageFilter.BLUR), (imw, 0))
+        else:
+            newimg.paste(rgbimg, (0, 0))
+            newimg.paste(rgbimg, (imw, 0))
     opix = rgbimg.load()
     npix = newimg.load()
-    if dobuff:
-        dbuff = __blank_buffer__(imh, imw * 2) # rows, cols
+    dbuff = __blank_buffer__(imh, imw * 2) # rows, cols
     for y in range(0, imh):
         for x in range(0, imw):
-            disp = disps[y, x]
-            ldx = x - (disp / 2)
+            depth = depths[y, x]
+            if do3ddepth:
+                ##########
+                # IS THIS THE RIGHT WAY TO COMPENSATE FOR DIFFERENT Z AXIS
+                # SCALE COMPARED TO IMAGE WIDTH (X) AND HEIGHT (Y) ??????
+                if dscl:
+                    dscale = dscl
+                else:
+                    dscale = ((imw + imw) / 2) / 255
+                depth = depth * dscale
+                depth = math.sqrt(((x - (imw / 2)) * (x - (imw / 2))) + ((y - (imh / 2)) * (y - (imh / 2))) + (depth * depth))
+                depth = depth / dscale
+                ##########
+                if depth > 255:
+                    depth = 255
+            disp = dispvect[int(depth)]
+            ldx = x + (disp / 2)
             ldx = int(ldx + 0.5)
             if ldx < 0:
                 ldx = 0
             if ldx >= imw:
                 ldx = imw - 1
-            rdx = x + (disp / 2)
+            rdx = x - (disp / 2)
             rdx = int(rdx + 0.5)
             if rdx < 0:
                 rdx = 0
             if rdx >= imw:
                 rdx = imw - 1
-            if dobuff:
-                if depths[y, x] < dbuff[y, ldx]:
-                    dbuff[y, ldx] = depths[y, x]
-                    npix[x, y] = opix[ldx, y]
-                if depths[y, x] < dbuff[y, rdx + imw]:
-                    dbuff[y, rdx + imw] = depths[y, x]
-                    npix[x + imw, y] = opix[rdx, y]
-            else:
+            if depth < dbuff[y, ldx]:
+                dbuff[y, ldx] = depth
                 npix[x, y] = opix[ldx, y]
+            if depth < dbuff[y, rdx + imw]:
+                dbuff[y, rdx + imw] = depth
                 npix[x + imw, y] = opix[rdx, y]
     return newimg
 
-
 # PRIVATE HELPER FUNCTIONS
 
-def __map__(num,smin,smax,emin,emax):
-    return (((num-smin)/(smax-smin))*(emax-emin))+emin
+def __map__(num, smin, smax, emin, emax):
+    return (((num - smin) / (smax - smin)) * (emax - emin)) + emin
+
+def __constrain__(nval, nmin, nmax):
+    rv = nval
+    if rv < nmin:
+        rv = nmin
+    if rv > nmax:
+        rv = nmax
+    return rv
 
 def __open_image_file__(fname, maxwid=None):
     img = Image.open(fname)
@@ -188,6 +223,7 @@ def __array_info__(arr):
                 amx = arr[y, x]
     avg = avg / nav
     return [amn, amx, avg]
+
 
 if __name__ == '__main__':
     print("Depthmaps tests.")
