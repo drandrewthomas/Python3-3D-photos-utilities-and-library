@@ -1,6 +1,6 @@
 # Changelog
 
-## 17 August 2025
+## 7 August 2025
 
 * The depthmaps.py library module now contains additional depthmap-related functions and one to convert depthmaps, with a tile image, into autostereograms.
 
