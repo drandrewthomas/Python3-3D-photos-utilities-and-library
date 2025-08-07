@@ -1,5 +1,11 @@
 # Changelog
 
+## 17 August 2025
+
+* The depthmaps.py library module now contains additional depthmap-related functions and one to convert depthmaps, with a tile image, into autostereograms.
+
+* A new example has been added, aptly named autostereo.py, to illustrate how the autostereogram-related functions in depthmaps.py work.
+
 ## 17 May 2025
 
 * The quick_rgbd_to_stereo function has been removed from the depthmaps.py library module as the full method shown in the depth2sbs.py example is quite simple to use.
